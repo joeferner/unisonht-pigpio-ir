@@ -1,34 +1,55 @@
 import {
     DeviceStatus,
-    NextFunction,
     RouteHandlerRequest,
     RouteHandlerResponse,
-    UnisonHT,
+    SupportedButtons,
     UnisonHTDevice,
 } from '@unisonht/unisonht';
 import { PigpioIr, Remote } from 'pigpio-ir';
+
+export interface PigpioIrDeviceOptions {
+    pigpioIr: PigpioIr;
+}
 
 export class PigpioIrDevice implements UnisonHTDevice {
     private readonly pigpioIr: PigpioIr;
     private readonly deviceName: string;
     private readonly remote: Remote;
+    private readonly buttonMap: SupportedButtons;
 
-    constructor(pigpioIr: PigpioIr, deviceName: string) {
-        this.pigpioIr = pigpioIr;
+    constructor(deviceName: string, options: PigpioIrDeviceOptions) {
         this.deviceName = deviceName;
-        this.remote = pigpioIr.options.remotes[deviceName];
+        this.pigpioIr = options.pigpioIr;
+        this.remote = this.pigpioIr.options.remotes[deviceName];
         if (!this.remote) {
             throw new Error(`Could not find remote '${deviceName}'`);
         }
+
+        this.buttonMap = {};
         for (const buttonName of Object.keys(this.remote.buttons)) {
-            const button = this.remote.buttons[buttonName];
+            this.buttonMap[buttonName] = {
+                name: buttonName,
+                description: `IR: ${deviceName}: ${buttonName}`,
+                handleButtonPress: async (
+                    button: string,
+                    request: RouteHandlerRequest,
+                    response: RouteHandlerResponse,
+                ): Promise<void> => {
+                    await this.pigpioIr.transmit(this.deviceName, buttonName);
+                    response.send();
+                },
+            };
         }
     }
 
-    public async initialize(unisonht: UnisonHT): Promise<void> {
+    public async initialize(): Promise<void> {
         if (!this.pigpioIr.started) {
             this.pigpioIr.start();
         }
+    }
+
+    public getSupportedButtons(): SupportedButtons {
+        return this.buttonMap;
     }
 
     public getDeviceName(): string {
@@ -37,14 +58,5 @@ export class PigpioIrDevice implements UnisonHTDevice {
 
     public async getStatus(): Promise<DeviceStatus> {
         return {};
-    }
-
-    public handleKeyPress(
-        key: string,
-        request: RouteHandlerRequest,
-        response: RouteHandlerResponse,
-        next: NextFunction,
-    ): Promise<void> {
-        return Promise.resolve(undefined);
     }
 }
