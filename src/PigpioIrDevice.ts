@@ -6,6 +6,7 @@ import {
     UnisonHTDevice,
 } from '@unisonht/unisonht';
 import { PigpioIr, Remote } from 'pigpio-ir';
+import pigpio from 'pigpio';
 
 export interface PigpioIrDeviceOptions {
     pigpioIr: PigpioIr;
@@ -57,6 +58,8 @@ export class PigpioIrDevice implements UnisonHTDevice {
     }
 
     public async getStatus(): Promise<DeviceStatus> {
-        return {};
+        return {
+            tick: pigpio.getTick(),
+        };
     }
 }
