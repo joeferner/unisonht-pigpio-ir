@@ -4,6 +4,7 @@ import {
     RouteHandlerResponse,
     SupportedButtons,
     UnisonHTDevice,
+    SupportedButtons,
 } from '@unisonht/unisonht';
 import { PigpioIr, Remote } from 'pigpio-ir';
 import pigpio from 'pigpio';
