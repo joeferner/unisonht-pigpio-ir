@@ -2,12 +2,14 @@ import {
     DeviceStatus,
     RouteHandlerRequest,
     RouteHandlerResponse,
-    SupportedButtons,
     UnisonHTDevice,
     SupportedButtons,
 } from '@unisonht/unisonht';
 import { PigpioIr, Remote } from 'pigpio-ir';
 import pigpio from 'pigpio';
+import Debug from 'debug';
+
+const debug = Debug('UnisonHT:pigpio-ir:PigpioIrDevice');
 
 export interface PigpioIrDeviceOptions {
     pigpioIr: PigpioIr;
@@ -59,6 +61,13 @@ export class PigpioIrDevice implements UnisonHTDevice {
     }
 
     public async getStatus(): Promise<DeviceStatus> {
+        if (process.env.NODE_ENV === 'development') {
+            debug(`skipping getStatus, NODE_ENV set to development`);
+            return {
+                tick: new Date().getTime()
+            }
+        }
+
         return {
             tick: pigpio.getTick(),
         };
