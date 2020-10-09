@@ -64,8 +64,8 @@ export class PigpioIrDevice implements UnisonHTDevice {
         if (process.env.NODE_ENV === 'development') {
             debug(`skipping getStatus, NODE_ENV set to development`);
             return {
-                tick: new Date().getTime()
-            }
+                tick: new Date().getTime(),
+            };
         }
 
         return {
