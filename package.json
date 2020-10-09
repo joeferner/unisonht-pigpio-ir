@@ -21,6 +21,7 @@
   "dependencies": {
     "@unisonht/unisonht": "0.x",
     "debug": "4.x",
+    "pigpio": "3.2.x",
     "pigpio-ir": "0.x"
   },
   "devDependencies": {
