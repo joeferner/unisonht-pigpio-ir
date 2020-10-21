@@ -1,6 +1,6 @@
 {
   "name": "@unisonht/pigpio-ir",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "UnisonHT plugin using pigpio-ir",
   "main": "dist/index.js",
   "scripts": {
